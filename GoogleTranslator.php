@@ -32,7 +32,8 @@ if( !defined( 'MEDIAWIKI' ) ) {
  * The following variables may need to be reset in your LocalSettings.php.
   */
 $wgGoogleTranslatorOriginal  = $wgLanguageCode; // Original languages of the page that needs translation
-$wgGoogleTranslatorLanguages  = 'fr,de';        // Languages included in the translating box
+$wgGoogleTranslatorLanguages  = 'es,en,fr';
+$wgGoogleTranslatorIdPlacement = 'p-translation'; // HTML id where to place the widget
 
 $wgExtensionCredits['other'][] = array(
 	'name'           => 'Google Translator',
@@ -49,19 +50,26 @@ $wgAutoloadClasses['GoogleTranslator'] = $dir . 'GoogleTranslator.class.php';
 #$wgExtensionMessagesFiles['GoogleTranslator'] = $dir . 'GoogleTranslator.i18n.php';
 
 // Hook to modify the sidebar
-$wgHooks['SkinBuildSidebar'][] = 'GoogleTranslator::GoogleTranslatorInSidebar';
+# $wgHooks['SkinBuildSidebar'][] = 'GoogleTranslator::GoogleTranslatorInSidebar';
 
 //js footer
 $wgHooks['SkinAfterContent'][] = function(&$data, $skin) {
-	global $wgGoogleTranslatorOriginal,$wgGoogleTranslatorLanguages;
+	global $wgGoogleTranslatorOriginal,$wgGoogleTranslatorLanguages, $wgGoogleTranslatorIdPlacement;
 	$data .= 
 			"
-	<script>
+    <script>
+      function removeAllChildNodes(parent) {
+        while (parent.firstChild) {
+          parent.removeChild(parent.firstChild);
+        }
+      }
+      const container = document.querySelector('#".$wgGoogleTranslatorIdPlacement."');
+      removeAllChildNodes(container);
 			function googleTranslateElementInit() {
 				new google.translate.TranslateElement({
 					pageLanguage: '".$wgGoogleTranslatorOriginal."',
 					includedLanguages: '".$wgGoogleTranslatorLanguages."'
-				}, 'google_translate_element');
+				}, '".$wgGoogleTranslatorIdPlacement."' );
 			}
 	</script>
 	<script src=\"//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\"></script>".
